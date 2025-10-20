@@ -1,0 +1,192 @@
+{
+  "session_id": "40752b8d-caf5-4494-8875-02ade0ec0713",
+  "test_start_time": "2025-10-20T16:53:04.454698",
+  "test_end_time": "2025-10-20T16:53:09.078271",
+  "total_tests": 10,
+  "passed_tests": 10,
+  "failed_tests": 0,
+  "success_rate": "100.0%",
+  "total_duration": "4.62s",
+  "results": [
+    {
+      "test_name": "Service Connectivity",
+      "passed": true,
+      "duration": "0.04s",
+      "error": null,
+      "details": {
+        "Ollama": "\u2705 Running",
+        "DynamoDB Local": "\u2705 Running",
+        "MinIO": "\u2705 Running",
+        "FastAPI Backend": "\u2705 Running",
+        "Chainlit App": "\u2705 Running"
+      }
+    },
+    {
+      "test_name": "Model Configuration",
+      "passed": true,
+      "duration": "0.00s",
+      "error": null,
+      "details": {
+        "provider": "ollama",
+        "model_id": "llama3.2:latest",
+        "model_object": "<class 'strands.models.ollama.OllamaModel'>"
+      }
+    },
+    {
+      "test_name": "Storage Services",
+      "passed": true,
+      "duration": "0.03s",
+      "error": null,
+      "details": {
+        "s3_upload": true,
+        "s3_download": true,
+        "dynamodb_save": true,
+        "dynamodb_retrieve": true
+      }
+    },
+    {
+      "test_name": "Orchestrator Agent",
+      "passed": true,
+      "duration": "0.98s",
+      "error": null,
+      "details": {
+        "routing_tests": {
+          "Generate a technical solution ": "Error: model \"llama3.2:latest\" not found, try pulling it first (status code: 404)",
+          "Create a compliance checklist": "Error: model \"llama3.2:latest\" not found, try pulling it first (status code: 404)",
+          "Draft financial projections": "Error: model \"llama3.2:latest\" not found, try pulling it first (status code: 404)",
+          "Analyze requirements and creat": "Error: model \"llama3.2:latest\" not found, try pulling it first (status code: 404)"
+        },
+        "orchestration_success": true,
+        "result_keys": [
+          "section",
+          "agent",
+          "summary",
+          "output",
+          "content_key",
+          "reasoning"
+        ]
+      }
+    },
+    {
+      "test_name": "API Endpoints",
+      "passed": true,
+      "duration": "0.03s",
+      "error": null,
+      "details": {
+        "health_endpoint": true,
+        "save_session": true,
+        "get_session": true,
+        "load_content": true
+      }
+    },
+    {
+      "test_name": "Canvas Functionality",
+      "passed": true,
+      "duration": "0.00s",
+      "error": null,
+      "details": {
+        "html_file_exists": true,
+        "js_file_exists": true,
+        "canvas_served": true
+      }
+    },
+    {
+      "test_name": "End-to-End Workflow",
+      "passed": true,
+      "duration": "0.93s",
+      "error": null,
+      "details": {
+        "test_document_available": true,
+        "scenario_results": {
+          "Analyze the requirements and c": {
+            "success": true,
+            "agent": "ContentAgent",
+            "has_output": true
+          },
+          "Design a technical solution ar": {
+            "success": true,
+            "agent": "ContentAgent",
+            "has_output": true
+          },
+          "Create a compliance checklist": {
+            "success": true,
+            "agent": "ContentAgent",
+            "has_output": true
+          }
+        },
+        "successful_scenarios": 3
+      }
+    },
+    {
+      "test_name": "Import Resilience",
+      "passed": true,
+      "duration": "2.55s",
+      "error": null,
+      "details": {
+        "core_imports": {
+          "main_module": "\u2705 Success",
+          "orchestrator": "\u2705 Success",
+          "model_config": "\u2705 Success",
+          "services": "\u2705 Success"
+        },
+        "agent_imports": {
+          "content_agent": "\u2705 Success",
+          "strategist_agent": "\u2705 Success"
+        },
+        "successful_imports": 4,
+        "total_imports": 4
+      }
+    },
+    {
+      "test_name": "File Structure",
+      "passed": true,
+      "duration": "0.00s",
+      "error": null,
+      "details": {
+        "files": {
+          "main.py": "\u2705 Exists",
+          "scripts/start.py": "\u2705 Exists",
+          "scripts/setup.py": "\u2705 Exists",
+          "testsuite.py": "\u2705 Exists",
+          "fastapi_backend.py": "\u2705 Exists",
+          "requirements.txt": "\u2705 Exists",
+          "config.yaml": "\u2705 Exists",
+          "docker-compose.yaml": "\u2705 Exists",
+          "README.md": "\u2705 Exists"
+        },
+        "directories": {
+          "agents": "\u2705 Exists",
+          "agents/specialized": "\u2705 Exists",
+          "agents/functional": "\u2705 Exists",
+          "config": "\u2705 Exists",
+          "services": "\u2705 Exists",
+          "utils": "\u2705 Exists",
+          "public": "\u2705 Exists"
+        },
+        "missing_files": [],
+        "missing_directories": [],
+        "files_present": 9,
+        "dirs_present": 7
+      }
+    },
+    {
+      "test_name": "Configuration Validation",
+      "passed": true,
+      "duration": "0.05s",
+      "error": null,
+      "details": {
+        "config_files": {
+          "config_yaml": "\u274c Invalid: expected '<document start>', but found '<scalar>'\n",
+          "requirements_txt": "\u2705 Has dependencies",
+          "docker_compose": "\u2705 Valid Docker config"
+        },
+        "environment_variables": {
+          "MODEL_PROVIDER": "\u2705 ollama",
+          "MODEL_ID": "\u2705 qwen3:4b",
+          "OLLAMA_HOST": "\u2705 http://localhost:11434"
+        },
+        "valid_configs": 2
+      }
+    }
+  ]
+}
