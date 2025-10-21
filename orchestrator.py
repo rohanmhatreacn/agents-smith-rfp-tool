@@ -4,7 +4,7 @@ import os
 from typing import Any
 from strands import Agent
 from llm import llm_provider
-from agents import AGENT_REGISTRY
+from agents import AGENT_REGISTRY, _call_openai
 from document import document_processor
 from storage import storage
 from export import exporter
@@ -27,10 +27,14 @@ class Orchestrator:
         Sets up the main coordination agent for intelligent decision-making.
         """
         self.agents = AGENT_REGISTRY
-        self.routing_agent = Agent(
-            model=llm_provider.get_model(),
-            system_prompt=self._get_routing_prompt()
-        )
+        # Use direct OpenAI call if OpenAI is the current provider
+        if llm_provider.current_provider == "openai":
+            self.routing_agent = None  # Will use direct OpenAI calls
+        else:
+            self.routing_agent = Agent(
+                model=llm_provider.get_model(),
+                system_prompt=self._get_routing_prompt()
+            )
         self.proposal_state = {}
     
     
@@ -143,7 +147,12 @@ Be concise and decisive."""
         """
         try:
             routing_query = f"Route this query to the appropriate agent: {query[:500]}"
-            response = self.routing_agent(routing_query)
+            
+            # Use direct OpenAI call if OpenAI is the current provider
+            if llm_provider.current_provider == "openai":
+                response = _call_openai(self._get_routing_prompt(), routing_query)
+            else:
+                response = self.routing_agent(routing_query)
             
             response_str = str(response).strip()
             if response_str.startswith("```"):

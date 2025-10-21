@@ -92,13 +92,19 @@ class LLMProvider:
         os.environ['OLLAMA_HOST'] = config.ollama_host
     
     
-    def get_model(self) -> str:
+    def get_model(self):
         """
-        Returns the active LLM model name for agent initialization.
-        Strands Agent constructor accepts model name strings directly.
+        Returns the active LLM model for agent initialization.
+        For OpenAI, returns None to use direct OpenAI integration.
+        For Bedrock/Ollama, returns the model name for Strands.
         """
         if not self.model_name:
             self._initialize()
+        
+        # For OpenAI, return None to bypass Strands and use direct integration
+        if self.current_provider == "openai":
+            return None
+        
         return self.model_name
     
     

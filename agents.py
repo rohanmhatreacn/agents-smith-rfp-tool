@@ -1,8 +1,31 @@
 import logging
 from strands import Agent, tool
 from llm import llm_provider
+import openai
+import os
 
 logger = logging.getLogger(__name__)
+
+
+def _call_openai(system_prompt: str, user_query: str) -> str:
+    """
+    Helper function to call OpenAI directly when using OpenAI provider.
+    """
+    try:
+        client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_query}
+            ],
+            max_tokens=500,
+            temperature=0.7
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"OpenAI API call failed: {e}")
+        raise
 
 
 @tool
@@ -19,11 +42,17 @@ def strategist_agent(query: str) -> str:
     Keep response to exactly one paragraph, 100 words max."""
     
     try:
-        agent = Agent(
-            model=llm_provider.get_model(),
-            system_prompt=system_prompt
-        )
-        response = agent(f"Analyze this RFP: {query}")
+        # Use direct OpenAI call if OpenAI is the current provider
+        if llm_provider.current_provider == "openai":
+            response = _call_openai(system_prompt, f"Analyze this RFP: {query}")
+        else:
+            # Use Strands for Bedrock/Ollama
+            agent = Agent(
+                model=llm_provider.get_model(),
+                system_prompt=system_prompt
+            )
+            response = agent(f"Analyze this RFP: {query}")
+        
         logger.info("✅ Strategist agent completed")
         return str(response)
     except Exception as e:
@@ -45,11 +74,17 @@ def solution_architect_agent(query: str) -> str:
     Keep response to exactly one paragraph, 100 words max."""
     
     try:
-        agent = Agent(
-            model=llm_provider.get_model(),
-            system_prompt=system_prompt
-        )
-        response = agent(f"Design solution for: {query}")
+        # Use direct OpenAI call if OpenAI is the current provider
+        if llm_provider.current_provider == "openai":
+            response = _call_openai(system_prompt, f"Design solution for: {query}")
+        else:
+            # Use Strands for Bedrock/Ollama
+            agent = Agent(
+                model=llm_provider.get_model(),
+                system_prompt=system_prompt
+            )
+            response = agent(f"Design solution for: {query}")
+        
         logger.info("✅ Solution architect agent completed")
         return str(response)
     except Exception as e:
@@ -93,11 +128,17 @@ def content_agent(query: str) -> str:
     Keep response to exactly one paragraph, 100 words max."""
     
     try:
-        agent = Agent(
-            model=llm_provider.get_model(),
-            system_prompt=system_prompt
-        )
-        response = agent(f"Write proposal content for: {query}")
+        # Use direct OpenAI call if OpenAI is the current provider
+        if llm_provider.current_provider == "openai":
+            response = _call_openai(system_prompt, f"Write proposal content for: {query}")
+        else:
+            # Use Strands for Bedrock/Ollama
+            agent = Agent(
+                model=llm_provider.get_model(),
+                system_prompt=system_prompt
+            )
+            response = agent(f"Write proposal content for: {query}")
+        
         logger.info("✅ Content agent completed")
         return str(response)
     except Exception as e:

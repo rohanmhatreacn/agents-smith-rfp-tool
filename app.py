@@ -232,19 +232,7 @@ async def handle_message(message: cl.Message):
 
 {agent_output}
 
----
-
-<details>
-<summary>📋 Session Details</summary>
-
-**Agent:** {result['agent']}  
-**Reasoning:** {result['reasoning']}  
-**Session ID:** `{result['session_id']}`  
-**Timestamp:** {result['timestamp']}
-
 💡 Type `/export` to generate a full proposal document
-
-</details>
 """
         
         logger.info(f"Sending response to UI (length: {len(response_content)} chars)")
