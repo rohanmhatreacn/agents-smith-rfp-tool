@@ -1,6 +1,5 @@
 import logging
-from strands import Agent
-from strands_tools import tool
+from strands import Agent, tool
 from llm import llm_provider
 
 logger = logging.getLogger(__name__)
