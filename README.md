@@ -1,339 +1,320 @@
-# AI RFP Assistant
+# 🤖 RFP Proposal Tool
 
-An intelligent multi-agent system for Request for Proposal (RFP) analysis, generation, and management. This solution uses specialized AI agents to handle different aspects of RFP processing including requirements analysis, technical solution design, compliance checking, and financial evaluation.
+AI-powered Request for Proposal (RFP) response generation tool using multi-agent orchestration. Built with Strands, Chainlit, and Gradio.
 
-## Features
+## ✨ Features
 
-- **Multi-Agent Architecture**: Specialized agents for different RFP tasks
-- **Document Processing**: Upload and analyze RFP documents
-- **Interactive Chat UI**: Chainlit-based web interface
-- **AWS Integration**: Cloud services for storage and processing
-- **Compliance Checking**: Automated validation against RFP criteria
-- **Financial Analysis**: Cost breakdown and pricing generation
+- **🎯 Intelligent Routing**: Automatically routes queries to specialized AI agents
+- **🤖 7 Specialized Agents**: Strategist, Solution Architect, Diagram, Content, Financial, Compliance, Review
+- **📄 Document Processing**: Extracts content from PDF, DOCX, XLSX using Docling
+- **💾 Auto Storage**: Seamless local (MinIO + SQLite) and cloud (S3 + DynamoDB) storage
+- **🎨 Interactive Chat UI**: Chainlit interface with in-chat commands
+- **📦 Export**: Generate DOCX and PDF proposals with embedded diagrams
+- **🔄 Auto-Deploy**: Docker Compose for local, CloudFormation for AWS
 
-## Quick Start
+## 🚀 Quick Start
 
-1. **Clone and Setup:**
-   ```bash
-   git clone <repository-url>
-   cd agents_smith_rfp
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+### Prerequisites
 
-2. **Configure Environment:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your API keys and settings
-   ```
+- **Python 3.11** (exact version required)
+- **Docker** running (for local storage)
+- API keys for OpenAI or AWS Bedrock (optional, falls back to Ollama)
 
-3. **Start the Application:**
-   ```bash
-   # Option 1: Use the startup script (recommended)
-   ./start_app.sh
-   
-   # Option 2: Manual startup
-   source venv/bin/activate
-   # Backend runs on 8001; Chainlit UI on 8000
-   python fastapi_backend.py &  # serves on http://localhost:8001
-   chainlit run main.py --port 8000 --host 0.0.0.0
-   ```
-
-4. **Access the UI:**
-   - Open your browser to `http://localhost:8000`
-   - Login with `admin` / `admin` (development credentials)
-
-## Fixed Issues
-
-✅ **Output Display**: Fixed canvas display issues - output now shows directly in the chat
-✅ **Reasoning Display**: Fixed reasoning to show actual AI reasoning instead of just process steps  
-✅ **Action Validation**: Fixed Action payload validation error
-✅ **FastAPI Backend**: Fixed backend startup and stability issues
-✅ **Chainlit Module**: Fixed virtual environment activation issues
-   ```
-
-### Service Configuration
-
-#### Local Development (Default)
-- **DynamoDB**: Local instance on `http://localhost:8000`
-- **S3 Storage**: MinIO on `http://localhost:9000`
-- **AI Model**: Ollama on `http://localhost:11434`
-
-#### Production Deployment
-Set these environment variables to use AWS services:
-```bash
-export DYNAMODB_LOCAL=false
-export S3_LOCAL=false
-export AWS_ACCESS_KEY_ID=your_access_key
-export AWS_SECRET_ACCESS_KEY=your_secret_key
-export AWS_DEFAULT_REGION=us-west-2
-```
-
-### Service Access URLs
-
-When running locally, you can access:
-- **Application**: http://localhost:8080
-- **Ollama API**: http://localhost:11434
-- **DynamoDB Local**: http://localhost:8000
-- **MinIO Console**: http://localhost:9001 (admin: minioadmin/minioadmin123)
-- **MinIO API**: http://localhost:9000
-
-### Verify Service Setup
-Test that all services are running:
-```bash
-# Test Ollama
-curl http://localhost:11434/api/tags
-
-# Test DynamoDB Local
-curl http://localhost:8000
-
-# Test MinIO
-curl http://localhost:9000/minio/health/live
-```
-
-### Troubleshooting Services
-- **Ollama not running**: Run `ollama serve` or `docker-compose up -d ollama`
-- **DynamoDB Local not running**: Run `docker-compose up -d dynamodb-local`
-- **MinIO not running**: Run `docker-compose up -d minio`
-- **Model not found**: Run `ollama pull qwen3:4b` or `docker exec ollama ollama pull qwen3:4b`
-
-### Quick Start (Recommended)
-
-Use the unified development CLI for easy setup and startup:
+### Installation
 
 ```bash
-# Setup development environment (one-time)
-python scripts/dev.py setup
+# 1. Copy config (optional)
+cp .env.example .env
 
-# Start the application (FastAPI + Chainlit)
-python scripts/dev.py start
-
-# Check service health
-python scripts/dev.py check
+# 2. Start everything
+./start.sh
 ```
 
-The setup command will:
-1. Create a Python virtual environment (`.venv`)
-2. Install all required dependencies
-3. Check and start Docker services (DynamoDB Local and MinIO)
-4. Verify Ollama setup
+The `start.sh` script automatically:
+- ✅ Finds Python 3.11
+- ✅ Starts Docker/MinIO storage
+- ✅ Creates or reuses virtual environment (smart caching!)
+- ✅ Installs dependencies only when needed
+- ✅ Launches the UI
 
-The start command will:
-1. Start FastAPI backend on port 8000
-2. Start Chainlit web interface on port 8081
-3. Provide graceful shutdown with Ctrl+C
+**First run:** ~2 minutes  
+**Subsequent runs:** ~5-10 seconds (venv reused, dependencies cached)
 
-### Alternative: Individual Commands
+Access the tool at:
+- **Chainlit UI**: http://localhost:8000
+- **MinIO Console**: http://localhost:9001 (optional, for storage management)
 
-You can also run the setup and start scripts individually:
+> ⏳ **Note**: The UI takes 20-30 seconds to initialize on startup while loading LLM providers, storage, and agents. Wait for the "RFP Tool is ready!" message.
 
-```bash
-# Setup only
-python scripts/setup.py
-
-# Start only (after setup)
-python scripts/start.py
-```
-
-### Testing Services
-
-After setup, you can test that all services are working correctly:
-
-```bash
-python test_services.py
-```
-
-This will run comprehensive tests on both DynamoDB and S3/MinIO services.
-
-### Manual Setup
-
-If you prefer manual setup:
-
-1. **Create and activate virtual environment:**
-   ```bash
-   python -m venv .venv
-   
-   # On macOS/Linux:
-   source .venv/bin/activate
-   
-   # On Windows:
-   .venv\Scripts\activate
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-3. **Start the application:**
-   ```bash
-   # Option 1: Use the unified CLI
-   python scripts/dev.py start
-   
-   # Option 2: Start individual services
-   python scripts/start.py
-   
-   # Option 3: Start Chainlit only
-   chainlit run main.py --host localhost --port 8080
-   ```
-
-### Access the Application
-
-Once started, open your browser and navigate to:
-- **Chainlit App**: http://localhost:8081
-- **FastAPI Backend**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-
-**Default Login Credentials:**
-- Username: `admin`
-- Password: `admin`
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-agents_smith_rfp/
-├── agents/
-│   ├── functional/          # Core processing agents
-│   │   ├── ingest_agent.py
-│   │   ├── embed_agent.py
-│   │   ├── draft_agent.py
-│   │   ├── refine_agent.py
-│   │   └── export_agent.py
-│   ├── specialized/         # Domain-specific agents
-│   │   ├── strategist_agent.py
-│   │   ├── solution_architect_agent.py
-│   │   ├── diagram_agent.py
-│   │   ├── content_agent.py
-│   │   ├── financial_agent.py
-│   │   ├── compliance_agent.py
-│   │   └── review_agent.py
-│   └── orchestrator_agent.py # Main coordination agent
-├── services/                # External service integrations
-│   ├── dynamodb_client.py
-│   └── s3_client.py
-├── utils/                   # Helper utilities
-│   └── helpers.py
-├── config/                  # Configuration files
-│   └── model_config.py
-├── assets/                  # Static assets
-│   └── logo/
-│       ├── accenture_no_bg.png
-│       └── accenture_white_bg.jpeg
-├── public/                  # Public web assets
-│   ├── canvas.html
-│   └── canvas.js
-├── main.py                  # Chainlit application entry point
-├── fastapi_backend.py       # FastAPI backend server
-├── scripts/                  # Development scripts
-│   ├── dev.py               # Unified development CLI
-│   ├── setup.py             # Development environment setup
-│   ├── start.py             # Development startup orchestration
-│   └── check.py             # Service health checks
-├── requirements.txt         # Python dependencies
-├── config.yaml             # Configuration file
-├── docker-compose.yaml     # Docker services configuration
-├── chainlit.md            # Chainlit welcome page
-└── README.md              # This file
+rfp-tool/
+├── app.py                  # Chainlit + Gradio UI
+├── main.py                 # CLI entry point
+├── config.py               # Environment detection & config
+├── llm.py                  # LLM provider abstraction
+├── storage.py              # Storage auto-routing
+├── agents.py               # 7 specialized agents
+├── orchestrator.py         # Intelligent routing
+├── document.py             # Document processing
+├── export.py               # DOCX/PDF/Image export
+├── start.sh                # Auto-start script
+├── docker-compose.yaml      # Local storage
+├── cloudformation.yaml      # AWS deployment
+├── requirements.txt        # Dependencies
+└── tests/                  # Unit & integration tests
 ```
 
-## Usage
+## 🔧 Configuration
 
-1. **Upload RFP Documents**: Use the chat interface to upload RFP documents for analysis
-2. **Ask Questions**: Interact with the system using natural language queries
-3. **Generate Content**: Request specific sections like technical solutions, financial breakdowns, or compliance checks
-4. **Review and Refine**: Use the review agent to polish generated content
+### LLM Provider Priority
 
-### Example Queries
+The tool automatically selects the best available LLM:
 
-- "Summarize the key requirements of the uploaded RFP"
-- "Generate the technical solution section of the proposal"
-- "Check the proposal draft against RFP compliance criteria"
-- "Generate pricing breakdown and cost justifications"
-
-## Configuration
-
-The application can be configured through environment variables or the `config.yaml` file:
+1. **OpenAI** (if `OPENAI_API_KEY` is set)
+2. **AWS Bedrock** (if AWS credentials available)
+3. **Ollama** (fallback, requires local Ollama server)
 
 ### Environment Variables
 
-- `MODEL_PROVIDER`: "ollama" for local, "bedrock" for AWS Bedrock
-- `MODEL_ID`: Model identifier (e.g., "qwen3:4b", "llama3.2:latest")
-- `DYNAMODB_LOCAL`: "true" for local DynamoDB, "false" for AWS DynamoDB
-- `S3_LOCAL`: "true" for MinIO, "false" for AWS S3
-- `MCP_MODE`: "local" for local processing, "cloud" for AWS-hosted MCP servers
-- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`: AWS credentials for production
-
-### Configuration File
-
-Copy `env.qwen.example` to `.env` and modify as needed:
-
 ```bash
-cp env.qwen.example .env
+# .env file
+
+# OpenAI (Priority 1)
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4
+
+# AWS Bedrock (Priority 2)
+AWS_REGION=us-east-1
+BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+
+# Ollama (Fallback)
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+
+# Storage (auto-configured)
+STORAGE_BUCKET=rfp-tool-storage
+STORAGE_TABLE=rfp-tool-sessions
 ```
 
-### Service Endpoints
+## 💻 Usage
 
-#### Local Development
-- DynamoDB: `http://localhost:8000`
-- MinIO: `http://localhost:9000`
-- Ollama: `http://localhost:11434`
+### Web UI (Recommended)
 
-#### Production (AWS)
-- DynamoDB: Uses AWS credentials and region
-- S3: Uses AWS credentials and region
-- Bedrock: Uses AWS credentials and region
+1. Start with `./start.sh`
+2. Open http://localhost:8000
+3. Upload RFP document or type a query
+4. Review AI-generated response from the appropriate specialist agent
+5. Continue the conversation or use commands:
 
-## Troubleshooting
+**Available Chat Commands:**
+- `/help` - Show all available commands
+- `/export` - Generate proposal as DOCX
+- `/export pdf` - Generate proposal as PDF
 
-### Common Issues
-
-1. **Virtual Environment Issues:**
-   - Ensure Python 3.11+ is installed
-   - Delete `.venv` folder and run setup again if corrupted
-
-2. **Dependency Installation Issues:**
-   - Update pip: `pip install --upgrade pip`
-   - Install dependencies individually if bulk install fails
-
-3. **Service Connection Issues:**
-   - **DynamoDB Local**: Check if running on port 8000, restart with `docker-compose up -d dynamodb-local`
-   - **MinIO**: Check if running on port 9000, restart with `docker-compose up -d minio`
-   - **Ollama**: Check if running on port 11434, restart with `ollama serve`
-
-4. **Port Already in Use:**
-   - Change the port in `scripts/start.py` or use: `chainlit run main.py --port 8080`
-
-5. **Import Errors:**
-   - Ensure virtual environment is activated
-   - Verify all dependencies are installed correctly
-
-6. **File Not Found Errors:**
-   - Run `python test_services.py` to verify services are working
-   - Check that Docker services are running: `docker-compose ps`
-   - Verify service health: `curl http://localhost:8000` (DynamoDB), `curl http://localhost:9000/minio/health/live` (MinIO)
-
-### Getting Help
-
-If you encounter issues:
-1. Check that all dependencies are installed correctly
-2. Verify Python version compatibility
-3. Ensure virtual environment is properly activated
-4. Check console output for specific error messages
-
-## Development
-
-For development and testing:
-
-```bash
-# Run tests
-python -m pytest tests/
-
-# Run specific test file
-python -m pytest tests/test_agents.py
+**Example Workflow:**
+```
+1. Upload RFP document → AI processes and analyzes
+2. Review the analysis in chat
+3. Ask follow-up questions (e.g., "Show me the technical architecture")
+4. Type `/export` to generate final proposal
+5. Download from `.data/proposals/`
 ```
 
-## License
+### Command Line
 
-This project is part of the Agents Smith RFP solution.
+```bash
+# Process a query
+python main.py --input "Analyze this RFP for requirements"
+
+# Process with document
+python main.py --input "Generate proposal" --file rfp.pdf
+
+# Generate full proposal
+python main.py --input "Create proposal" --output proposal.docx --format docx
+```
+
+## 🤖 Available Agents
+
+| Agent | Purpose | Output |
+|-------|---------|--------|
+| **Strategist** | Requirements analysis, win themes | 1 paragraph summary |
+| **Solution Architect** | Technical design, AWS architecture | 1 paragraph design |
+| **Diagram** | Architecture visualization | JSON diagram data |
+| **Content** | Proposal writing, narratives | 1 paragraph content |
+| **Financial** | Pricing, cost breakdowns | Simple table (3 rows) |
+| **Compliance** | Requirement validation | 1 paragraph review |
+| **Review** | Final quality check | 1 paragraph assessment |
+
+## 🧪 Testing
+
+Run tests with:
+
+```bash
+pytest tests/ -v
+```
+
+Tests include:
+- Agent routing logic
+- Document extraction
+- Storage persistence
+- Session management
+
+Try with sample RFP:
+```bash
+python main.py --input "Analyze" --file tests/sample_rfp.md
+```
+
+## ☁️ AWS Deployment
+
+### Deploy Infrastructure
+
+```bash
+aws cloudformation create-stack \
+  --stack-name rfp-tool-production \
+  --template-body file://cloudformation.yaml \
+  --parameters ParameterKey=Environment,ParameterValue=production \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+
+### Update Configuration
+
+After deployment, update `.env`:
+
+```bash
+STORAGE_BUCKET=rfp-tool-storage-production
+STORAGE_TABLE=rfp-tool-sessions-production
+```
+
+The app automatically detects AWS environment and uses cloud resources.
+
+## 🔍 Troubleshooting
+
+### Virtual Environment Issues
+
+The script intelligently manages the virtual environment using hash-based dependency tracking:
+
+**Force dependency reinstall:**
+```bash
+rm .venv_requirements_hash
+./start.sh
+```
+
+**Recreate venv completely:**
+```bash
+rm -rf venv .venv_requirements_hash
+./start.sh
+```
+
+**How it works:**
+- First run: Creates venv, installs all deps (~2 min)
+- Subsequent runs: Reuses venv, skips installation (~5-10 sec)
+- After `requirements.txt` changes: Auto-detects and updates deps
+- Corrupted venv: Automatically recreated
+
+### MinIO Storage Issues
+
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+### LLM Connection Issues
+
+1. Check API keys in `.env`
+2. Verify AWS credentials: `aws sts get-caller-identity`
+3. Test Ollama: `curl http://localhost:11434/api/version`
+
+### Document Processing Fails
+
+Ensure file format is supported:
+- ✅ PDF, DOCX, XLSX, MD
+- ❌ Scanned images without OCR
+
+### Can't Access UI
+
+The app binds to `localhost:8000`. Access via:
+- http://localhost:8000
+- http://127.0.0.1:8000
+
+If neither works, check that port 8000 is not in use.
+
+## 📚 Extending the Tool
+
+### Add New Agent
+
+```python
+# In agents.py
+@tool
+def my_agent(query: str) -> str:
+    """Agent description"""
+    system_prompt = """Specific instructions"""
+    agent = Agent(
+        model=llm_provider.get_model(),
+        system_prompt=system_prompt
+    )
+    return agent(query)
+
+# Add to registry
+AGENT_REGISTRY = {
+    ...
+    "my_agent": my_agent
+}
+```
+
+Update routing prompt in `orchestrator.py` to include new agent.
+
+### Add Export Format
+
+```python
+# In export.py
+def export_custom(content: dict, output_path: str) -> str:
+    """Export to custom format"""
+    # Implementation
+    return output_path
+```
+
+### Add UI Component
+
+```python
+# In app.py, in create_gradio_interface()
+with gr.Tab("New Feature"):
+    # Add Gradio components
+```
+
+## 🏗️ Architecture
+
+### Design Principles
+
+1. **Auto-Detection:** Environment, credentials, resources detected automatically
+2. **Zero Config:** Works with sensible defaults
+3. **Graceful Fallback:** LLM providers fail over (OpenAI → Bedrock → Ollama)
+4. **Storage Abstraction:** Same API for local/cloud backends
+5. **Minimal Code:** ~1,330 lines across 10 files
+
+### System Flow
+
+```
+User Input → Document Extraction → Orchestrator Routing → 
+Agent Execution → Storage → Response Display
+```
+
+For detailed technical architecture, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## 🙏 Built With
+
+- [Strands](https://github.com/strands-agents) - Multi-agent framework
+- [Chainlit](https://chainlit.io) - Chat UI
+- [Gradio](https://gradio.app) - Refinement UI
+- [Docling](https://github.com/DS4SD/docling) - Document processing
+- AWS Bedrock - Cloud AI services
+
+## 📖 Documentation
+
+- **ARCHITECTURE.md** - Detailed technical architecture and design patterns
+- **tests/sample_rfp.md** - Sample RFP for testing
+
+---
+
+**Questions or issues?** Create a GitHub issue or check the troubleshooting section above.

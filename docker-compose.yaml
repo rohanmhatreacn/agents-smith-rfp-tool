@@ -1,43 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schemas/compose-spec.json
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-    restart: unless-stopped
-    # Uncomment the following lines to automatically pull the qwen3:4b model
-    # command: >
-    #   sh -c "ollama serve & 
-    #          sleep 10 && 
-    #          ollama pull qwen3:4b && 
-    #          wait"
-
-  dynamodb-local:
-    image: amazon/dynamodb-local:latest
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
-    restart: unless-stopped
-
   minio:
     image: minio/minio:latest
-    container_name: minio
+    container_name: rfp-tool-minio
     ports:
       - "9000:9000"
       - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
-    command: server /data --console-address ":9001"
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - rfp-network
 
 volumes:
-  ollama_data:
   minio_data:
+    driver: local
+
+networks:
+  rfp-network:
+    driver: bridge
+
